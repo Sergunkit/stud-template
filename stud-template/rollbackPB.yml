@@ -1,0 +1,46 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: delete user
+      ansible.builtin.user:
+        name: ansible-worker
+        state: absent
+        remove: yes
+      become_user: root
+
+    - name: uninstall git
+      ansible.builtin.apt:
+        name: git
+        state: absent
+      become: yes
+
+    - name: uninstall nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: absent
+      become: yes
+      
+    - name: delete sites-enabled
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/ansible.iphilka.ru.conf 
+        state: absent
+      become: yes
+
+    - name: delete nginx config
+      ansible.builtin.file:
+        path: /etc/nginx/sites-available/nginx.conf
+        state: absent
+      become: yes
+
+    - name: delete nginx config
+      ansible.builtin.file:
+        path: /etc/nginx/sites-available/ansible.iphilka.ru.conf
+        state: absent
+      become: yes
+
+    - name: delete HTML
+      ansible.builtin.file:
+        path: /usr/share/nginx/html/index.html
+        state: absent
+      become: yes
+

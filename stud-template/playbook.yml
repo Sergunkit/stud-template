@@ -1,0 +1,50 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: create user
+      ansible.builtin.user:
+        name: ansible-worker
+        state: present
+      become_user: root
+
+    - name: install git
+      ansible.builtin.apt:
+        name: git
+        state: latest
+      become_user: ansible-worker
+      tags: git
+
+    - name: install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: latest
+      become_user: ansible-worker
+      tags: nginx
+      
+    - name: update nginx config
+      ansible.builtin.copy:
+        src: ansible.iphilka.ru.conf
+        dest: /etc/nginx/sites-available
+      become_user: ansible-worker
+      notify:
+      - link with sites-enabled
+      tags: [nginx, config]
+
+    - name: copy HTML
+      ansible.builtin.copy:
+        src: index.html
+        dest: /usr/share/nginx/html/index.html
+      become: yes
+
+  handlers:
+    - name: link with sites-enabled
+      ansible.builtin.shell:
+        cmd: sudo ln -s /etc/nginx/sites-available/ansible.iphilka.ru.conf /etc/nginx/sites-enabled
+      become: yes
+
+    - name: nginx systemd
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: yes
+        state: started
+      become: yes
