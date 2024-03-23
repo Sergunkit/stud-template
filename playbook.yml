@@ -30,14 +30,22 @@
         dest: /home/ansible-worker/www/
         accept_hostkey: yes
         key_file: ~/www/stud-template/ssh_keys/id_rsa
-        # ssh_opts: '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
     - name: install nginx
       ansible.builtin.apt:
         name: nginx
         state: latest
       become_user: ansible-worker
-      tags: nginx
+      notify:
+      - link with sites-enabled
+
+    - name: update nginx config
+      ansible.builtin.copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+      notify:
+      - restart nginx
+      become: yes
       
     - name: update nginx config
       ansible.builtin.copy:
@@ -45,8 +53,7 @@
         dest: /etc/nginx/sites-available
       become_user: ansible-worker
       notify:
-      - link with sites-enabled
-      tags: [nginx, config]
+      - nginx start
 
     - name: copy HTML
       ansible.builtin.copy:
@@ -60,9 +67,15 @@
         cmd: sudo ln -s /etc/nginx/sites-available/ansible.iphilka.ru.conf /etc/nginx/sites-enabled
       become: yes
 
-    - name: nginx systemd
+    - name: nginx start
       ansible.builtin.systemd:
         name: nginx
         enabled: yes
         state: started
+      become: yes
+
+    - name: restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
       become: yes
