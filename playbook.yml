@@ -14,7 +14,7 @@
       become_user: ansible-worker
       tags: git
 
-    - name: Убедиться, что директория для клонирования существует
+    - name: check dir exsist
       ansible.builtin.file:
         path: /home/ansible-worker/www/
         state: directory
@@ -26,16 +26,11 @@
 
     - name: clone repo
       ansible.builtin.git:
-        repo: git@github.com:iphilka/stud-template.git
+        repo: 'https://git@github.com/iphilka/stud-template.git'
         dest: /home/ansible-worker/www/
         accept_hostkey: yes
-        key_file: /users/ansible-worker/.ssh/id_rsa
-
-    # - name: clone repo
-    #   ansible.builtin.git:
-    #     dest: /home/ansible-worker/www/
-    #     repo: git@github.com:iphilka/stud-template.git
-    #     ssh_opts: ssh_keys/id_rsa ssh_keys/id_rsa.pub
+        key_file: ~/www/stud-template/ssh_keys/id_rsa
+        # ssh_opts: '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
     - name: install nginx
       ansible.builtin.apt:

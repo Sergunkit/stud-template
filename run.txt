@@ -1,1 +1,2 @@
+ssh-copy-id -i ssh_keys/id_rsa.pub ansible-worker@51.250.51.42
 ansible-playbook -u root playbook.yml -i hosts.ini
