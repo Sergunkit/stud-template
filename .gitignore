@@ -1,5 +1,4 @@
 ssh_keys/
 rollbackPB.yml
-nginx.conf
 pb1.yml
- .DS_Store/
+.DS_Store/
